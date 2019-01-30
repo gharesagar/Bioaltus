@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CheckInActivity"
+    android:background="@color/colorPrimary">
+
+
+    <RelativeLayout
+        android:layout_margin="15sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_margin="10dp"
+                    android:orientation="vertical"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+
+                        android:src="@drawable/cardiogram"
+                        android:layout_width="80sp"
+                        android:layout_height="80sp" />
+
+                    <customtools.BoldTextview
+                        android:layout_marginTop="5dp"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Existing"
+                        android:textSize="25dp"
+                        android:textColor="@color/light_black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_margin="10dp"
+
+                    android:orientation="vertical"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:src="@drawable/doctor"
+                        android:layout_width="80sp"
+                        android:layout_height="80sp" />
+
+                    <customtools.BoldTextview
+                        android:layout_marginTop="5dp"
+                        android:layout_gravity="center_horizontal"
+                        android:text="New"
+                        android:textSize="25dp"
+                        android:textColor="@color/light_black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_corners"
+                android:orientation="horizontal">
+
+                <customtools.RegularTextview
+                    android:id="@+id/tvCheckIn"
+                    android:layout_width="0dp"
+                    android:layout_height="40sp"
+                    android:layout_gravity="center"
+                    android:layout_weight="4.5"
+                    android:text="Customer Name"
+                    android:paddingStart="8dp"
+                    android:textColor="@color/light_black"
+                    android:textStyle="bold"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:id="@+id/imgDrop1"
+                    android:layout_width="0dp"
+                    android:layout_height="12sp"
+                    android:layout_gravity="center"
+                    android:layout_margin="3dp"
+                    android:layout_weight="0.5"
+                    android:src="@drawable/dropdownarrow" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/white_corners"
+                android:orientation="horizontal">
+
+                <customtools.RegularTextview
+                    android:id="@+id/tvCheckOut"
+                    android:layout_width="0dp"
+                    android:layout_height="40sp"
+                    android:layout_gravity="center"
+                    android:layout_weight="4.5"
+                    android:text="Product Name"
+                    android:paddingStart="8dp"
+                    android:textColor="@color/light_black"
+                    android:textStyle="bold"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:id="@+id/imgDrop2"
+                    android:layout_width="0dp"
+                    android:layout_height="12sp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    android:layout_margin="3dp"
+                    android:layout_weight="0.5"
+                    android:src="@drawable/dropdownarrow" />
+
+            </LinearLayout>
+
+            <customtools.RegularEditText
+                android:hint="Remark"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:paddingTop="4dp"
+                android:layout_marginTop="10dp"
+                android:lines="5"
+                android:textSize="18sp"
+                android:paddingStart="8dp"
+                android:background="@drawable/white_corners"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <customtools.RegularButton
+            android:padding="2dp"
+            android:id="@+id/btLogin"
+            android:text="Check In"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bt_bg"
+            android:textAllCaps="false"
+            android:layout_alignParentEnd="true"
+            android:layout_width="120sp"
+            android:layout_height="45dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

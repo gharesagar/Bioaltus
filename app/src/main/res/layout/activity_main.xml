@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="140sp"
+        android:background="@color/white">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/bioaltus_logo"
+            android:scaleType="fitCenter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_below="@+id/logo"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <customtools.BoldTextview
+            android:textSize="30sp"
+            android:text="LOGIN"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <customtools.RegularEditText
+            android:layout_marginTop="10dp"
+            android:id="@+id/edtEmployeeCode"
+            android:textColor="@color/light_black"
+            android:textColorHint="@color/light_black"
+            android:hint="Employee code"
+            android:textSize="16sp"
+            android:gravity="center_vertical"
+            android:paddingStart="5dp"
+            android:background="@drawable/white_corners"
+            android:layout_width="match_parent"
+            android:layout_height="45sp" />
+
+        <customtools.RegularEditText
+            android:layout_marginTop="15dp"
+            android:id="@+id/edtPassword"
+            android:textColor="@color/light_black"
+            android:textColorHint="@color/light_black"
+            android:hint="Password"
+            android:textSize="16sp"
+            android:gravity="center_vertical"
+            android:paddingStart="5dp"
+            android:background="@drawable/white_corners"
+            android:layout_width="match_parent"
+            android:layout_height="45sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <customtools.RegularButton
+                android:padding="2dp"
+                android:id="@+id/btLogin"
+                android:text="Login"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/bt_bg"
+                android:textAllCaps="false"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp" />
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

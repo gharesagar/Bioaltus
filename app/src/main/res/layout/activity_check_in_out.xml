@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CheckInOutActivity"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/white_corners"
+            android:orientation="horizontal">
+
+            <customtools.RegularTextview
+                android:id="@+id/tvCheckIn"
+                android:layout_width="0dp"
+                android:layout_height="40sp"
+                android:layout_gravity="center"
+                android:layout_weight="4.5"
+                android:text="Check In"
+                android:paddingStart="10dp"
+                android:textColor="@color/light_black"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:id="@+id/img11"
+                android:layout_width="0dp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="3dp"
+                android:layout_weight="0.5"
+                android:layout_marginEnd="2dp"
+                android:tint="@color/colorPrimary"
+                android:src="@drawable/medicalkit_white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/white_corners"
+            android:orientation="horizontal">
+
+            <customtools.RegularTextview
+                android:id="@+id/tvCheckOut"
+                android:layout_width="0dp"
+                android:layout_height="40sp"
+                android:layout_gravity="center"
+                android:layout_weight="4.5"
+                android:text="Check Out"
+                android:paddingStart="10dp"
+                android:textColor="@color/light_black"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:id="@+id/img2"
+                android:layout_width="0dp"
+                android:layout_height="30sp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="3dp"
+                android:layout_weight="0.5"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/medicalkit_black" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>
