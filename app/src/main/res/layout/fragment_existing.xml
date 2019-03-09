@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="fragment.ExistingCustomerFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/dark_corners"
+            android:orientation="horizontal">
+
+            <customtools.RegularTextview
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="40sp"
+                android:layout_gravity="center"
+                android:layout_weight="4.5"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:paddingStart="5dp"
+                android:text="Customer Name"
+                android:textColor="@color/light_black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgDrop1"
+                android:layout_width="0dp"
+                android:layout_height="12sp"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:layout_weight="0.5"
+                android:src="@drawable/dropdownarrow" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/dark_corners"
+            android:orientation="horizontal">
+
+            <customtools.RegularTextview
+                android:padding="10dp"
+                android:id="@+id/tvProductName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4.5"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:paddingStart="5dp"
+                android:text="Product Name"
+                android:textColor="@color/light_black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgDrop2"
+                android:layout_width="0dp"
+                android:layout_height="12sp"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:layout_weight="0.5"
+                android:scaleType="centerInside"
+                android:src="@drawable/dropdownarrow" />
+
+        </LinearLayout>
+
+        <customtools.RegularEditText
+            android:id="@+id/edtRemark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/dark_corners"
+            android:gravity="start"
+            android:hint="Remark"
+            android:lines="5"
+            android:paddingStart="5dp"
+            android:paddingTop="4dp"
+            android:textColor="@color/light_black"
+            android:textColorHint="@color/light_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <customtools.RegularButton
+        android:id="@+id/btCheckIn"
+        android:layout_width="120sp"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/bt_bg"
+        android:padding="2dp"
+        android:text="Check In"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+</RelativeLayout>

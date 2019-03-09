@@ -5,31 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    android:background="@color/colorPrimary">
+    tools:context=".LoginActivity"
+    android:id="@+id/rootLayout"
+    android:background="@color/white">
 
-    <LinearLayout
+<!--    <LinearLayout
+        android:layout_marginTop="50dp"
         android:id="@+id/logo"
         android:layout_width="match_parent"
         android:layout_height="140sp"
-        android:background="@color/white">
+        android:background="@color/white">-->
 
         <ImageView
+            android:layout_marginTop="50dp"
+            android:id="@+id/logo"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:src="@drawable/bioaltus_logo"
             android:scaleType="fitCenter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
 
+<!--
     </LinearLayout>
+-->
 
 
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:layout_below="@+id/logo"
-        android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_width="match_parent"
@@ -40,7 +44,7 @@
             android:textSize="30sp"
             android:text="LOGIN"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/colorPrimaryDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -50,10 +54,11 @@
             android:textColor="@color/light_black"
             android:textColorHint="@color/light_black"
             android:hint="Employee code"
+            android:inputType="number"
             android:textSize="16sp"
             android:gravity="center_vertical"
             android:paddingStart="5dp"
-            android:background="@drawable/white_corners"
+            android:background="@drawable/dark_corners"
             android:layout_width="match_parent"
             android:layout_height="45sp" />
 
@@ -66,7 +71,8 @@
             android:textSize="16sp"
             android:gravity="center_vertical"
             android:paddingStart="5dp"
-            android:background="@drawable/white_corners"
+            android:inputType="textPassword"
+            android:background="@drawable/dark_corners"
             android:layout_width="match_parent"
             android:layout_height="45sp" />
 
@@ -90,6 +96,24 @@
         </RelativeLayout>
 
 
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <View
+            android:background="@color/sky"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+
+        <View
+            android:background="@color/colorPrimaryDark"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
 
     </LinearLayout>
 

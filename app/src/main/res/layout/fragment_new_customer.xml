@@ -1,0 +1,132 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="fragment.NewCustomerFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <customtools.RegularEditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="center_vertical"
+                android:hint="Name"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <customtools.RegularEditText
+                android:id="@+id/edtMobile"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="center_vertical"
+                android:hint="Mobile"
+                android:inputType="number"
+                android:maxLength="10"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <customtools.RegularEditText
+                android:id="@+id/edtEmailId"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="center_vertical"
+                android:hint="Email Id"
+                android:inputType="textEmailAddress"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+
+<!--
+            <customtools.RegularEditText
+                android:id="@+id/edtProduct"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="center_vertical"
+                android:hint="Product"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+-->
+
+            <customtools.RegularEditText
+                android:id="@+id/edtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="start"
+                android:hint="Address"
+                android:lines="4"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+
+
+<!--
+            <customtools.RegularEditText
+                android:id="@+id/edtRemark"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/dark_corners"
+                android:gravity="start"
+                android:hint="Remark"
+                android:lines="4"
+                android:paddingStart="5dp"
+                android:textColor="@color/light_black"
+                android:textColorHint="@color/light_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+-->
+
+        </LinearLayout>
+
+        <customtools.RegularButton
+            android:id="@+id/btAdd"
+            android:layout_width="120sp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/bt_bg"
+            android:padding="2dp"
+            android:text="Add"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+    </RelativeLayout>
+
+</ScrollView>
+
