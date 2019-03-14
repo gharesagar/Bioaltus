@@ -28,6 +28,10 @@ dependencies {
     implementation 'com.github.MdFarhanRaja:SearchableSpinner:1.9'
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
 
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+
+    implementation 'pub.devrel:easypermissions:2.0.1'
+
 
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'

@@ -2,11 +2,9 @@ package com.example.administrator.bioaltus;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -69,7 +67,7 @@ public class CheckInOutActivity extends AppCompatActivity {
         cv3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CheckInOutActivity.this,abcd.class));
+                startActivity(new Intent(CheckInOutActivity.this,TrackEmpActivity.class));
             }
         });
 

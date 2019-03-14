@@ -59,11 +59,14 @@ import java.util.Map;
 
 import connectivity.ConnectivityReceiver;
 import dmax.dialog.SpotsDialog;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 import services.ApiConstants;
 import services.AppController;
 import services.SessionManager;
 
-public class LoginActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class LoginActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener, EasyPermissions.PermissionCallbacks {
 
     public String TAG = "LoginActivity";
     Button btLogin;
@@ -74,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
     ConnectivityReceiver connectivityReceiver;
     IntentFilter intentFilter;
     public final int PERMISSION_REQUEST_CODE = 101;
+    public final int PERM_REQUEST_CODE = 10;
     android.app.AlertDialog dialog;
 
     private GoogleApiClient googleApiClient;
@@ -81,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
     SessionManager sessionManager;
     LocationListener locationListener;
     LocationManager locationManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,39 +101,27 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
         dialog = new SpotsDialog.Builder().setContext(LoginActivity.this).setMessage("Please wait").build();
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
 
         try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                if (checkPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                 /*   if (checkPermission()) {
 
-                } else {
-                    requestPermission();
-                }
+                    } else {
+                        requestPermission();
+                    }*/
+
+                givePermission();
+            } else {
+                //below M
+                //getLocation();
             }
 
         } catch (Exception e) {
             Toast.makeText(LoginActivity.this, "Error Mesg : " + e.getMessage().toString(), Toast.LENGTH_LONG).show();
         }
 
-
-        this.setFinishOnTouchOutside(true);
-
-
-        LocationManager mgr = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (mgr.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
-            Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
-        }
-        // Todo Location Already on  ... end
-        if (!hasGPSDevice(LoginActivity.this)) {
-            Toast.makeText(LoginActivity.this, "Gps not Supported", Toast.LENGTH_SHORT).show();
-        }
-
-        if (!mgr.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
-            Toast.makeText(LoginActivity.this, "Gps not enabled", Toast.LENGTH_SHORT).show();
-            enableLoc();
-        } else {
-            Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
-        }
 
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +133,19 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
         });
 
         setConnectivityBroadcastReceiver();
+    }
+
+    @AfterPermissionGranted(PERM_REQUEST_CODE)
+    private void givePermission() {
+        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if (EasyPermissions.hasPermissions(this, perms)) {
+
+          //  getLocation();
+        } else {
+            EasyPermissions.requestPermissions(this, "We need permission of location",
+                    PERM_REQUEST_CODE, perms);
+        }
     }
 
     private void empLogin() {
@@ -226,7 +232,7 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
                                 // and check the result in onActivityResult().
                                 status.startResolutionForResult(LoginActivity.this, REQUEST_LOCATION);
 
-                               // finish();
+                                // finish();
                             } catch (IntentSender.SendIntentException e) {
                                 // Ignore the error.
                             }
@@ -263,7 +269,9 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+     /*   switch (requestCode) {
 
             case PERMISSION_REQUEST_CODE:
 
@@ -273,7 +281,7 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
                     Toast.makeText(LoginActivity.this, "Permission denied, Now you can't login", Toast.LENGTH_LONG).show();
                 }
                 break;
-        }
+        }*/
     }
 
     private void login() {
@@ -407,27 +415,31 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
     public void onNetworkConnectionChanged(boolean isConnected) {
 
         if (isConnected) {
-            // Todo Location Already on  ... start
-            // Acquire a reference to the system Location Manager
-            this.setFinishOnTouchOutside(true);
 
 
-            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
-                Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
-            }
-            // Todo Location Already on  ... end
-            if (!hasGPSDevice(LoginActivity.this)) {
-                Toast.makeText(LoginActivity.this, "Gps not Supported", Toast.LENGTH_SHORT).show();
-            }
 
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
-                Toast.makeText(LoginActivity.this, "Gps not enabled", Toast.LENGTH_SHORT).show();
-                enableLoc();
-            } else {
-                Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
-            }
+        }else {
 
+        }
+
+    }
+
+    private void getLocation() {
+
+        this.setFinishOnTouchOutside(true);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
+            Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
+        }
+        // Todo Location Already on  ... end
+        if (!hasGPSDevice(LoginActivity.this)) {
+            Toast.makeText(LoginActivity.this, "Gps not Supported", Toast.LENGTH_SHORT).show();
+        }
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(LoginActivity.this)) {
+            Toast.makeText(LoginActivity.this, "Gps not enabled", Toast.LENGTH_SHORT).show();
+            enableLoc();
+        } else {
+            Toast.makeText(LoginActivity.this, "Gps already enabled", Toast.LENGTH_SHORT).show();
 
             // Define a listener that responds to location updates
             locationListener = new LocationListener() {
@@ -480,7 +492,6 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
                 return;
             }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5, 0, locationListener);
-
         }
 
     }
@@ -490,6 +501,20 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
     protected void onPause() {
         super.onPause();
         //// Remove the listener you previously added
-        locationManager.removeUpdates(locationListener);
+       // locationManager.removeUpdates(locationListener);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+
+            new AppSettingsDialog.Builder(this).build().show();
+        }
     }
 }
