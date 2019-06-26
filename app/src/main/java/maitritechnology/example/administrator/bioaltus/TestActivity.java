@@ -1,4 +1,4 @@
-package com.example.administrator.bioaltus;
+package maitritechnology.example.administrator.bioaltus;
 
 import android.Manifest;
 import android.os.Build;
@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import com.maitritechnology.bioaltus.R;
 
 import java.util.List;
 

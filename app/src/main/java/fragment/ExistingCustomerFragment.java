@@ -1,9 +1,22 @@
 package fragment;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -30,16 +43,23 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.example.administrator.bioaltus.CheckInOutActivity;
-import com.example.administrator.bioaltus.LoginActivity;
-import com.example.administrator.bioaltus.R;
-
+import maitritechnology.example.administrator.bioaltus.CheckInOutActivity;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.maitritechnology.bioaltus.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import connectivity.ConnectivityReceiver;
@@ -50,6 +70,9 @@ import model.Customer;
 import model.Product;
 import services.ApiConstants;
 import services.AppController;
+import services.GpsUtils;
+import services.SessionManager;
+import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 
 
 /**
@@ -78,6 +101,19 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
     boolean isConnected;
     StringBuilder builder = new StringBuilder();
 
+    SessionManager sessionManager;
+    HashMap<String, String> empData;
+    String empId, productName, customerName, remark;
+
+    String locAddress;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private boolean isGPS = false;
+    double longitude, latitude;
+
+
     private boolean isConnected() {
         return isConnected = ConnectivityReceiver.isConnected(getContext());
     }
@@ -89,20 +125,89 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_existing, container, false);
 
+
+        sessionManager = new SessionManager(getActivity());
+        empData = new HashMap<>();
+        empData = sessionManager.getEmpDetails();
+        empId = empData.get(SessionManager.EMP_CODE);
+
         initViews();
         manager = getActivity().getSupportFragmentManager();
 
         multiSelectDialog = new MultiSelectDialog();
-        dialog = new SpotsDialog.Builder().setContext(getContext()).setMessage("Please wait").build();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
+
         loadProducts();
         loadCustomers();
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10 * 1000); // 10 seconds
+        locationRequest.setFastestInterval(5 * 1000); // 5 seconds
+
+        new GpsUtils(getActivity()).turnGPSOn(new GpsUtils.onGpsListener() {
+            @Override
+            public void gpsStatus(boolean isGPSEnable) {
+                // turn on GPS
+                isGPS = isGPSEnable;
+            }
+        });
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+
+                        Log.e(TAG, "latitude" + latitude + " longitude" + longitude);
+
+                        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+                            locAddress = addresses.get(0).getAddressLine(0);
+
+                            checkIn();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        };
+
+
         btCheckIn.setOnClickListener(this);
         tvProductName.setOnClickListener(this);
+        tvCustomerName.setOnClickListener(this);
+        imgDrop1.setOnClickListener(this);
+
+
+        spinnerDialog = new SpinnerDialog(getActivity(), customerNamesList, "Select customer");
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int pos) {
+                customerId = getCustomerId(pos);
+                tvCustomerName.setText(item);
+            }
+        });
+
 
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.e(TAG, "onStop");
+        //Removelocationupdates
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     private void initViews() {
@@ -118,7 +223,7 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
         productArrayList = new ArrayList<>();
         productsD = new ArrayList<>();
 
-        if(builder==null) {
+        if (builder == null) {
             builder.setLength(0);
         }
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstants.PRODUCT_MASTER, new Response.Listener<String>() {
@@ -154,6 +259,7 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                         productsNameList.add(productName);
                     }
 
+                    tvProductName.setEnabled(true);
                     //MultiSelectModel
                     multiSelectDialog.title("Select product") //setting title for dialog
                             .titleSize(25)
@@ -171,9 +277,10 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                                                 "Selected Names : " + selectedNames.get(i) + "\n" +
                                                 "DataString : " + dataString, Toast.LENGTH_SHORT).show();
 
-                                        builder.append(selectedNames.get(i)+ "\n");
+                                        builder.append(selectedNames.get(i) + "\n");
 
                                     }
+                                    tvProductName.setText("");
                                     tvProductName.setText(builder.toString());
 
 
@@ -233,7 +340,7 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
         customerArrayList = new ArrayList<>();
         customerNamesList = new ArrayList<>();
 
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstants.CUSTOMER_MASTER, new Response.Listener<String>() {
+        final StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiConstants.CUSTOMER_MASTER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -258,28 +365,8 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                         customerNamesList.add(cutomerName);
                     }
 
-                    spinnerDialog = new SpinnerDialog(getActivity(), customerNamesList, "Select customer");
-                    spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
-                        @Override
-                        public void onClick(String item, int pos) {
-                            customerId = getCustomerId(pos);
-                            tvCustomerName.setText(item);
-                        }
-                    });
+                    tvCustomerName.setEnabled(true);
 
-                    tvCustomerName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            spinnerDialog.showSpinerDialog();
-                        }
-                    });
-
-                    imgDrop1.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            spinnerDialog.showSpinerDialog();
-                        }
-                    });
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -311,7 +398,14 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                 al.show();
 
             }
-        });
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("EmpID", empId);
+                return params;
+            }
+        };
 
         int MY_SOCKET_TIMEOUT_MS = 30000;
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
@@ -337,14 +431,20 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
             case R.id.btCheckIn:
                 empCheckIn();
                 break;
+            case R.id.tvCustomerName:
+                spinnerDialog.showSpinerDialog();
+                break;
+            case R.id.imgDrop1:
+                spinnerDialog.showSpinerDialog();
+                break;
         }
     }
 
     private void empCheckIn() {
 
-        String productName = tvProductName.getText().toString().trim();
-        String customerName = tvCustomerName.getText().toString().trim();
-        String remark = edtRemark.getText().toString().trim();
+        productName = tvProductName.getText().toString().trim();
+        customerName = tvCustomerName.getText().toString().trim();
+        remark = edtRemark.getText().toString().trim();
 
 
         if (remark.isEmpty() && remark.matches("")) {
@@ -359,10 +459,57 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
 
             if (isConnected()) {
 
-                checkIn();
-            } else {
-                Toast.makeText(getContext(), "No internet", Toast.LENGTH_SHORT).show();
+                if (!isGPS) {
+                    Toast.makeText(getActivity(), "Please turn on GPS", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                if (checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                    requestPermissions( new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                            ApiConstants.LOCATION_REQUEST);
+
+                } else {
+
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                                @SuppressLint("MissingPermission")
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        longitude = location.getLongitude();
+                                        latitude = location.getLatitude();
+
+                                        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                                        try {
+                                            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+                                            locAddress = addresses.get(0).getAddressLine(0);
+
+                                            checkIn();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    } else {
+
+                                        //Location is null , request location
+                                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, e.toString());
+                                }
+                            });
+                }
+            } else {
+                Toast.makeText(getActivity(), "No internet connection!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -375,10 +522,14 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
 
                 try {
                     Log.e(TAG, response);
-
+                    //  {"PK_CID":0,"CID_ProductID":"AUCTIROZ 20\n","CID_CheckInID":"39","CID_EmpID":"222"}
                     JSONObject jsonObject = new JSONObject(response);
                     dialog.dismiss();
+
+                    //save checkin data to check visibility of checkin and checkout cardview
                     Toast.makeText(getActivity(), "Checkin successful!", Toast.LENGTH_SHORT).show();
+                    String mChecckInId = jsonObject.getString("CID_CheckInID");
+                    sessionManager.saveCheckInData(mChecckInId);
                     Intent intent = new Intent(getActivity(), CheckInOutActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -412,19 +563,22 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                 }
                 al.setTitle("Error");
                 al.setMessage(mesaage);
-                al.show();
+                //al.show();
             }
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
-                params.put("Location", "Thane");
-                params.put("CheckInDate", "05-03-2019");
-                params.put("CheckInTime", "10.00 Am");
-                params.put("CustomerID", tvCustomerName.getText().toString());
+                //locationAddress
+                params.put("Location", locAddress);
+                params.put("CheckInDate", "01/01/2019");
+                params.put("CheckInTime", "default");
+                params.put("CustomerID", customerId);
                 params.put("ProductID", tvProductName.getText().toString());
-                params.put("Remark", "This is remarks");
-                params.put("EmpID", "222");
+                params.put("Remark", edtRemark.getText().toString());
+                params.put("EmpID", empId);
+
+                Log.e(TAG, locAddress);
                 return params;
             }
         };
@@ -436,6 +590,95 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         AppController.getInstance().addToRequestQueue(stringRequest);
+
+        dialog = new SpotsDialog.Builder().setContext(getContext()).setMessage("Please wait").build();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
         dialog.show();
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+
+            case ApiConstants.LOCATION_REQUEST: {
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(getActivity(),  Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null) {
+                                        longitude = location.getLongitude();
+                                        latitude = location.getLatitude();
+
+                                        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                                        try {
+                                            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+                                            locAddress = addresses.get(0).getAddressLine(0);
+
+                                            checkIn();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+
+                                        //Location is null , request location
+                                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                                ActivityCompat.checkSelfPermission(getActivity(),  Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                            // TODO: Consider calling
+                                            //    ActivityCompat#requestPermissions
+                                            // here to request the missing permissions, and then overriding
+                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                            //                                          int[] grantResults)
+                                            // to handle the case where the user grants the permission. See the documentation
+                                            // for ActivityCompat#requestPermissions for more details.
+                                            return;
+                                        }
+                                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, e.toString());
+                                }
+                            });
+
+                } else {
+                    Toast.makeText(getActivity(), "Permission denied. Please allow go to settings", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == ApiConstants.GPS_REQUEST) {
+                isGPS = true; // flag maintain before get location
+            }
+        }
+    }
+
 }

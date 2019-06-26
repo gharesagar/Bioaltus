@@ -4,7 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CheckInOutActivity">
+    tools:context="maitritechnology.example.administrator.bioaltus.CheckInOutActivity">
+
+    <Button
+        android:id="@+id/btLogout"
+        android:text="Logout"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_centerInParent="true"
@@ -38,7 +45,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:text="Check In"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="22sp" />
 
             </RelativeLayout>
@@ -72,7 +79,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:text="Check Out"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="22sp" />
 
             </RelativeLayout>
@@ -106,7 +113,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:text="Track Emp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="22sp" />
 
             </RelativeLayout>

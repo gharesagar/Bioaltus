@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.administrator.bioaltus">
+    package="com.maitritechnology.bioaltus">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
-    <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -20,23 +17,27 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:usesCleartextTraffic="true"
+        android:roundIcon="@drawable/bioaltus_app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
         <activity
-            android:name=".LoginActivity"
+            android:name="maitritechnology.example.administrator.bioaltus.LoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".CheckInOutActivity"
+            android:name="maitritechnology.example.administrator.bioaltus.CheckInOutActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".MainActivity"
+            android:name="maitritechnology.example.administrator.bioaltus.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|adjustResize|stateAlwaysHidden" />
 
-        <activity android:name=".SplashActivity">
+        <activity android:name="maitritechnology.example.administrator.bioaltus.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,10 +46,10 @@
         </activity>
 
         <activity
-            android:name=".LoginActivity2"
+            android:name="maitritechnology.example.administrator.bioaltus.LoginActivity2"
             android:label="@string/title_activity_login2" />
-        <activity android:name=".TrackEmpActivity" />
-        <activity android:name=".TestActivity">
+        <activity android:name="maitritechnology.example.administrator.bioaltus.TrackEmpActivity" />
+        <activity android:name="maitritechnology.example.administrator.bioaltus.TestActivity">
 
         </activity>
     </application>

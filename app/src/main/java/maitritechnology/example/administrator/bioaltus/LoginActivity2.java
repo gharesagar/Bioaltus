@@ -1,16 +1,15 @@
-package fragment;
+package maitritechnology.example.administrator.bioaltus;
 
-
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
+import android.widget.RelativeLayout;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
@@ -23,107 +22,90 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.maitritechnology.bioaltus.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import connectivity.ConnectivityReceiver;
 import dmax.dialog.SpotsDialog;
 import services.ApiConstants;
 import services.AppController;
 import services.SessionManager;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class NewCustomerFragment extends Fragment {
 
-    public final String TAG = "NewCustomerFrag";
+public class LoginActivity2 extends AppCompatActivity {
 
-    View view;
-    EditText edtName,edtMobile,edtEmailId,edtAddress;
-    String name,mobile,email,address;
-    Button btAdd;
-
-    android.app.AlertDialog dialog;
+    public String TAG = "LoginActivity";
+    Button btLogin;
+    EditText edtEmployeeCode, edtPassword;
+    String empCode, password;
     boolean isConnected;
-
+    RelativeLayout rootLayout;
     SessionManager sessionManager;
-    HashMap<String, String> empData;
-    String empId;
+    android.app.AlertDialog dialog;
 
-    private boolean isConnected() {
-        return isConnected = ConnectivityReceiver.isConnected(getContext());
+
+    private void checkInternet() {
+        isConnected = ConnectivityReceiver.isConnected(LoginActivity2.this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        view=inflater.inflate(R.layout.fragment_new_customer, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login2);
 
-        sessionManager = new SessionManager(getActivity());
-        empData = new HashMap<>();
-        empData = sessionManager.getEmpDetails();
-        empId = empData.get(SessionManager.EMP_CODE);
+        btLogin = findViewById(R.id.btLogin);
+        edtEmployeeCode = findViewById(R.id.edtEmployeeCode);
+        edtPassword = findViewById(R.id.edtPassword);
+        rootLayout = findViewById(R.id.rootLayout);
 
-        edtName=view.findViewById(R.id.edtName);
-        edtEmailId=view.findViewById(R.id.edtEmailId);
-        edtMobile=view.findViewById(R.id.edtMobile);
-        edtAddress=view.findViewById(R.id.edtAddress);
-        btAdd=view.findViewById(R.id.btAdd);
-
-
-        dialog = new SpotsDialog.Builder().setContext(getContext()).setMessage("Please wait").build();
+        sessionManager = new SessionManager(LoginActivity2.this);
+        dialog = new SpotsDialog.Builder().setContext(LoginActivity2.this).setMessage("Please wait").build();
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
 
-        btAdd.setOnClickListener(new View.OnClickListener() {
+
+        btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addNewCustomer();
+                empLogin();
             }
         });
 
-
-        return view;
     }
 
-    private void addNewCustomer() {
-        name=edtName.getText().toString().trim();
-        mobile=edtMobile.getText().toString().trim();
-        email=edtEmailId.getText().toString().trim();
-        address=edtAddress.getText().toString().trim();
+    private void empLogin() {
+        boolean failFalg = false;
+        empCode = edtEmployeeCode.getText().toString().trim();
+        password = edtPassword.getText().toString().trim();
 
-        if(name.isEmpty()&& name.matches("")){
-            Toast.makeText(getContext(), "Add name", Toast.LENGTH_SHORT).show();
-
-        }else if (mobile.isEmpty()&& mobile.matches("")){
-            Toast.makeText(getContext(), "Add mobile", Toast.LENGTH_SHORT).show();
-
-        }else if(email.isEmpty()&& email.matches("")){
-            Toast.makeText(getContext(), "Add email", Toast.LENGTH_SHORT).show();
-
-        }else if(address.isEmpty()&& address.matches("")){
-            Toast.makeText(getContext(), "Add address", Toast.LENGTH_SHORT).show();
-
-        }else {
-            isConnected();
-            if(isConnected) {
-                addCustomer();
-            }else {
-                Toast.makeText(getContext(), "No internet", Toast.LENGTH_SHORT).show();
-
-            }
+        if (empCode.isEmpty() && empCode.matches("")) {
+            edtEmployeeCode.setError("Enter employee code");
+            failFalg = true;
         }
 
+        if (password.isEmpty() && password.matches("")) {
+            edtPassword.setError("Enter password");
+            failFalg = true;
+        }
+
+        if (!failFalg) {
+            checkInternet();
+
+            if (isConnected) {
+
+                login();
+
+
+            } else {
+                Snackbar.make(rootLayout, "No internet connection!", Snackbar.LENGTH_SHORT).show();
+            }
+        }
     }
 
-    private void addCustomer() {
+    private void login() {
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiConstants.ADD_CUSTOMER, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiConstants.LOGIN, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -137,20 +119,28 @@ public class NewCustomerFragment extends Fragment {
 
                     if (error) {
                         dialog.dismiss();
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        Snackbar.make(rootLayout, message, Snackbar.LENGTH_SHORT).show();
                     } else {
                         dialog.dismiss();
+                        //get json data first
+                        int empCode = jsonObject.getInt("UserName");
+                        String location = jsonObject.getString("Location");
+                        String empName = jsonObject.getString("EmpName");
 
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                        edtName.setText("");
-                        edtMobile.setText("");
-                        edtEmailId.setText("");
-                        edtAddress.setText("");
+                        sessionManager.createEmpLoginSession(empCode, location, empName);
+                        Snackbar.make(rootLayout, message, Snackbar.LENGTH_LONG).show();
+                        Intent intent = new Intent(LoginActivity2.this, CheckInOutActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                        // overridePendingTransitionEnter();
                     }
 
                 } catch (JSONException e) {
                     Log.e(TAG, e.getMessage());
                 }
+
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -158,7 +148,7 @@ public class NewCustomerFragment extends Fragment {
                 //Log.e(TAG, error.getMessage());
                 dialog.dismiss();
 
-                android.app.AlertDialog.Builder al = new android.app.AlertDialog.Builder(getContext());
+                AlertDialog.Builder al = new AlertDialog.Builder(LoginActivity2.this);
                 String mesaage = null;
                 if (error instanceof NetworkError) {
                     mesaage = "Cannot connect to Internet...Please check your connection!";
@@ -183,12 +173,9 @@ public class NewCustomerFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
-                params.put("CustomerName", name);
-                params.put("CustomerAddress", address);
-                params.put("CustomerMobileNo", mobile);
-                params.put("CustomerEmailId",email);
-                params.put("empid",empId);
-
+                params.put("UserName", empCode);
+                params.put("password", password);
+                params.put("Location", "Any");
                 return params;
             }
         };
@@ -201,6 +188,10 @@ public class NewCustomerFragment extends Fragment {
 
         AppController.getInstance().addToRequestQueue(stringRequest);
         dialog.show();
+
     }
 
 }
+
+
+

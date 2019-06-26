@@ -28,6 +28,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="5dp"
                 android:text="Customer Name"
+                android:enabled="false"
                 android:textColor="@color/light_black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -61,6 +62,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="5dp"
                 android:text="Product Name"
+                android:enabled="false"
                 android:textColor="@color/light_black"
                 android:textSize="16sp"
                 android:textStyle="bold" />

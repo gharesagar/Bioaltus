@@ -1,4 +1,4 @@
-package com.example.administrator.bioaltus;
+package maitritechnology.example.administrator.bioaltus;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -19,6 +20,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.maitritechnology.bioaltus.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +32,7 @@ import connectivity.ConnectivityReceiver;
 import dmax.dialog.SpotsDialog;
 import services.ApiConstants;
 import services.AppController;
+import services.SessionManager;
 
 public class CheckInOutActivity extends AppCompatActivity {
 
@@ -38,7 +41,13 @@ public class CheckInOutActivity extends AppCompatActivity {
 
     boolean isConnected;
 
-    private boolean isConnected() {
+    SessionManager sessionManager;
+    HashMap<String,String> empData,checkInData;
+    private String empId,mCheckInId;
+    private Button btLogout;
+
+
+    private boolean checkConnection() {
         return isConnected = ConnectivityReceiver.isConnected(CheckInOutActivity.this);
     }
 
@@ -50,17 +59,53 @@ public class CheckInOutActivity extends AppCompatActivity {
         cv1=findViewById(R.id.cv1);
         cv2=findViewById(R.id.cv2);
         cv3=findViewById(R.id.cv3);
+        btLogout=findViewById(R.id.btLogout);
+
         cv3.setVisibility(View.VISIBLE);
 
+        sessionManager=new SessionManager(this);
+        empData=new HashMap<>();
+        empData=sessionManager.getEmpDetails();
+        empId=empData.get(SessionManager.EMP_CODE);
+
+        checkInData=new HashMap<>();
+        checkInData=sessionManager.getCheckInDetails();
+        mCheckInId=checkInData.get(SessionManager.CHECKIN_ID);
 
         dialog = new SpotsDialog.Builder().setContext(CheckInOutActivity.this).setMessage("Please wait").build();
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
 
+        //it has checkin id
+        if(!mCheckInId.contains("default")){
+            cv1.setVisibility(View.GONE);
+            cv2.setVisibility(View.VISIBLE);
+
+        }else {
+            cv2.setVisibility(View.GONE);
+            cv1.setVisibility(View.VISIBLE);
+
+        }
+
+        //checkIn cardview
         cv1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(CheckInOutActivity.this,MainActivity.class));
+            }
+        });
+
+        //checkOut cardview
+        cv2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                checkConnection();
+                if(isConnected) {
+                    checkOut();
+                }else {
+                    Toast.makeText(getApplicationContext(), "No internet", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -71,21 +116,16 @@ public class CheckInOutActivity extends AppCompatActivity {
             }
         });
 
-        cv2.setOnClickListener(new View.OnClickListener() {
+        btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                isConnected();
-
-                if(isConnected) {
-                    Toast.makeText(getApplicationContext(), "Checkout screen", Toast.LENGTH_SHORT).show();
-                    checkOut();
-                }else {
-                    Toast.makeText(getApplicationContext(), "No internet", Toast.LENGTH_SHORT).show();
-
-                }
+                sessionManager.logoutEmp();
+                Intent intent=new Intent(CheckInOutActivity.this,LoginActivity2.class);
+                startActivity(intent);
+                finish();
             }
         });
+
     }
 
     private void checkOut() {
@@ -108,10 +148,14 @@ public class CheckInOutActivity extends AppCompatActivity {
                     }else {
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        cv3.setVisibility(View.GONE);
+                        cv1.setVisibility(View.VISIBLE);
+                        cv2.setVisibility(View.GONE);
 
+                        //After checkout pass "default" as checkout id
+                        sessionManager.saveCheckInData("default");
                     }
                 } catch (JSONException e) {
+
                 }
             }
         }, new Response.ErrorListener() {
@@ -145,10 +189,10 @@ public class CheckInOutActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> params = new HashMap<>();
-                params.put("CheckInId", "5");
-                params.put("EmpID", "223");
-                params.put("CheckOutDate", "06-03-2019");
-                params.put("CheckOutTime","10:00 Pm");
+                params.put("CheckInId", mCheckInId);
+                params.put("EmpID", empId);
+                params.put("CheckOutDate", "01-01-2019");
+                params.put("CheckOutTime","default");
                 return params;
             }
         };

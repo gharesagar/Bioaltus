@@ -1,8 +1,10 @@
-package com.example.administrator.bioaltus;
+package maitritechnology.example.administrator.bioaltus;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.maitritechnology.bioaltus.R;
 
 import services.SessionManager;
 
@@ -39,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();

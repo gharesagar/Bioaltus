@@ -1,4 +1,4 @@
-package com.example.administrator.bioaltus;
+package maitritechnology.example.administrator.bioaltus;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -37,6 +37,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.maitritechnology.bioaltus.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -174,116 +175,6 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
         }
     }
 
-    private boolean hasGPSDevice(Context context) {
-        final LocationManager mgr = (LocationManager) context
-                .getSystemService(Context.LOCATION_SERVICE);
-        if (mgr == null)
-            return false;
-        final List<String> providers = mgr.getAllProviders();
-        if (providers == null)
-            return false;
-        return providers.contains(LocationManager.GPS_PROVIDER);
-    }
-
-    private void enableLoc() {
-
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(LoginActivity.this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle bundle) {
-
-                        }
-
-                        @Override
-                        public void onConnectionSuspended(int i) {
-                            googleApiClient.connect();
-                        }
-                    })
-                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                        @Override
-                        public void onConnectionFailed(ConnectionResult connectionResult) {
-
-                            Log.d("Location error", "Location error " + connectionResult.getErrorCode());
-                        }
-                    }).build();
-            googleApiClient.connect();
-
-            LocationRequest locationRequest = LocationRequest.create();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(30 * 1000);
-            locationRequest.setFastestInterval(5 * 1000);
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(locationRequest);
-
-            builder.setAlwaysShow(true);
-
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                @Override
-                public void onResult(LocationSettingsResult result) {
-                    final Status status = result.getStatus();
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(LoginActivity.this, REQUEST_LOCATION);
-
-                                // finish();
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                    }
-                }
-            });
-        }
-    }
-
-
-    private boolean checkPermission() {
-
-        int coarseLocation = ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int fineLocation = ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if (coarseLocation == PackageManager.PERMISSION_GRANTED && fineLocation == PackageManager.PERMISSION_GRANTED) {
-            Log.e("PERMISSSION GRANTED", "PERMISSSION");
-
-            return true;
-        } else {
-            Log.e("PERMISSSION Denied", "PERMISSSION Denied");
-
-            return false;
-        }
-    }
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-     /*   switch (requestCode) {
-
-            case PERMISSION_REQUEST_CODE:
-
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-                    Toast.makeText(LoginActivity.this, "Permission denied, Now you can't login", Toast.LENGTH_LONG).show();
-                }
-                break;
-        }*/
-    }
-
     private void login() {
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiConstants.LOGIN, new Response.Listener<String>() {
@@ -306,8 +197,9 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
                         //get json data first
                         int empCode = jsonObject.getInt("UserName");
                         String location = jsonObject.getString("Location");
+                        String empName=jsonObject.getString("EmpName");
 
-                        sessionManager.createEmpLoginSession(empCode);
+                        sessionManager.createEmpLoginSession(empCode,location,empName);
                         Snackbar.make(rootLayout, message, Snackbar.LENGTH_LONG).show();
                         Intent intent = new Intent(LoginActivity.this, CheckInOutActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -370,6 +262,117 @@ public class LoginActivity extends AppCompatActivity implements ConnectivityRece
         dialog.show();
 
     }
+
+    private boolean hasGPSDevice(Context context) {
+        final LocationManager mgr = (LocationManager) context
+                .getSystemService(Context.LOCATION_SERVICE);
+        if (mgr == null)
+            return false;
+        final List<String> providers = mgr.getAllProviders();
+        if (providers == null)
+            return false;
+        return providers.contains(LocationManager.GPS_PROVIDER);
+    }
+
+    private void enableLoc() {
+
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(LoginActivity.this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            googleApiClient.connect();
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                            Log.d("Location error", "Location error " + connectionResult.getErrorCode());
+                        }
+                    }).build();
+            googleApiClient.connect();
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true);
+
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(LoginActivity.this, REQUEST_LOCATION);
+                                finish();
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+
+    private boolean checkPermission() {
+
+        int coarseLocation = ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        int fineLocation = ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (coarseLocation == PackageManager.PERMISSION_GRANTED && fineLocation == PackageManager.PERMISSION_GRANTED) {
+            Log.e("PERMISSSION GRANTED", "PERMISSSION");
+
+            return true;
+        } else {
+            Log.e("PERMISSSION Denied", "PERMISSSION Denied");
+
+            return false;
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+
+    }
+
+   /* @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+     *//*   switch (requestCode) {
+
+            case PERMISSION_REQUEST_CODE:
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+                    Toast.makeText(LoginActivity.this, "Permission denied, Now you can't login", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }*//*
+    }*/
+
+
 
 
     private void setConnectivityBroadcastReceiver() {
