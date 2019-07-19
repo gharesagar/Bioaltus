@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 
-public class RegularButton extends android.support.v7.widget.AppCompatButton {
+public class RegularButton extends androidx.appcompat.widget.AppCompatButton {
     public RegularButton(Context context) {
         super(context);
         init();

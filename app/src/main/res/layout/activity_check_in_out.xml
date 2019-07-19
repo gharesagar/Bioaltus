@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="maitritechnology.example.administrator.bioaltus.CheckInOutActivity">
+    tools:context="bio.example.administrator.bioaltus.CheckInOutActivity">
 
     <Button
         android:id="@+id/btLogout"
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/cv1"
             android:layout_width="150sp"
             android:layout_height="150sp"
@@ -50,9 +50,9 @@
 
             </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/cv2"
             android:layout_marginTop="10dp"
             android:layout_width="150sp"
@@ -84,9 +84,9 @@
 
             </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/cv3"
             android:layout_marginTop="10dp"
             android:layout_width="150sp"
@@ -118,7 +118,7 @@
 
             </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
 
     </LinearLayout>

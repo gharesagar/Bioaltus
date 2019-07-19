@@ -2,7 +2,7 @@ package fragment;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.maitritechnology.bioaltus.R;
+import com.bio.bioaltus.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,7 +133,7 @@ public class NewCustomerFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(response);
 
                     String message = jsonObject.getString("Message");
-                    Boolean error = jsonObject.getBoolean("Error");
+                    boolean error = jsonObject.getBoolean("Error");
 
                     if (error) {
                         dialog.dismiss();

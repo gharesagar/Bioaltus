@@ -3,23 +3,19 @@ package fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,12 +39,12 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import maitritechnology.example.administrator.bioaltus.CheckInOutActivity;
+import bio.example.administrator.bioaltus.CheckInOutActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.maitritechnology.bioaltus.R;
+import com.bio.bioaltus.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -72,7 +68,7 @@ import services.ApiConstants;
 import services.AppController;
 import services.GpsUtils;
 import services.SessionManager;
-import static android.support.v4.content.PermissionChecker.checkSelfPermission;
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
 
 
 /**
@@ -140,7 +136,6 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
         loadCustomers();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(10 * 1000); // 10 seconds
@@ -205,7 +200,6 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
     @Override
     public void onStop() {
         super.onStop();
-        Log.e(TAG, "onStop");
         //Removelocationupdates
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
@@ -541,10 +535,10 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e(TAG, error.getMessage());
+                Log.e(TAG, error.toString());
                 dialog.dismiss();
 
-                android.app.AlertDialog.Builder al = new android.app.AlertDialog.Builder(getContext());
+                android.app.AlertDialog.Builder al = new android.app.AlertDialog.Builder(getActivity());
                 String mesaage = null;
                 if (error instanceof NetworkError) {
                     mesaage = "Cannot connect to Internet...Please check your connection!";
@@ -563,7 +557,7 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                 }
                 al.setTitle("Error");
                 al.setMessage(mesaage);
-                //al.show();
+                al.show();
             }
         }) {
             @Override
