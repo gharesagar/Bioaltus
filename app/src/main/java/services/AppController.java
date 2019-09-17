@@ -1,7 +1,12 @@
 package services;
 
 import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -10,14 +15,10 @@ import com.android.volley.toolbox.Volley;
 
 import connectivity.ConnectivityReceiver;
 
-public class AppController extends Application {
+public class AppController extends MultiDexApplication {
 
-    public static final String TAG = AppController.class
-            .getSimpleName();
-
+    public static final String TAG = AppController.class.getSimpleName();
     private RequestQueue mRequestQueue;
-    private ImageLoader mImageLoader;
-
     private static AppController mInstance;
 
     @Override
@@ -26,23 +27,31 @@ public class AppController extends Application {
         mInstance = this;
     }
 
+    public static synchronized AppController getInstance() {
+        return mInstance;
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener){
         ConnectivityReceiver.connectivityReceiverListener=listener;
     }
 
-    public static synchronized AppController getInstance() {
-        return mInstance;
-    }
 
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+            mRequestQueue.getCache().clear();
+
         }
 
         return mRequestQueue;
     }
-
 
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         // set the default tag if tag is empty
@@ -51,6 +60,7 @@ public class AppController extends Application {
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
+        req.setShouldCache(false);
         req.setTag(TAG);
         getRequestQueue().add(req);
     }
@@ -60,4 +70,15 @@ public class AppController extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
+
+//    public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
+//        ConnectivityReceiver.connectivityReceiverListener = listener;
+//    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        Log.e("Application", "Application terminated.");
+    }
 }
+

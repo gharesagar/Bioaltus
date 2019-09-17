@@ -9,10 +9,12 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AlertDialog;
@@ -361,7 +363,6 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
 
                     tvCustomerName.setEnabled(true);
 
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -458,54 +459,63 @@ public class ExistingCustomerFragment extends Fragment implements View.OnClickLi
                     return;
                 }
 
-                if (checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                    requestPermissions( new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                            ApiConstants.LOCATION_REQUEST);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                ApiConstants.LOCATION_REQUEST);
+
+                    } else {
+                        getDeviceLocation();
+                    }
                 } else {
-
-                    fusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                                @SuppressLint("MissingPermission")
-                                @Override
-                                public void onSuccess(Location location) {
-                                    // Got last known location. In some rare situations this can be null.
-                                    if (location != null) {
-                                        longitude = location.getLongitude();
-                                        latitude = location.getLatitude();
-
-                                        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-                                        try {
-                                            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-
-                                            locAddress = addresses.get(0).getAddressLine(0);
-
-                                            checkIn();
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                    } else {
-
-                                        //Location is null , request location
-                                        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-
-                                    }
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.e(TAG, e.toString());
-                                }
-                            });
+                    getDeviceLocation();
                 }
             } else {
                 Toast.makeText(getActivity(), "No internet connection!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private void getDeviceLocation() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            longitude = location.getLongitude();
+                            latitude = location.getLatitude();
+
+                            Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                            try {
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+                                locAddress = addresses.get(0).getAddressLine(0);
+
+                                checkIn();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+
+                            //Location is null , request location
+                            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, e.toString());
+                    }
+                });
     }
 
     private void checkIn() {

@@ -22,7 +22,8 @@
         android:roundIcon="@drawable/bioaltus_app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        tools:replace="android:icon"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
